@@ -1,0 +1,67 @@
+import wmi
+import sys
+import configparser 
+
+def usage():
+    print('''Usage:
+             ipswitch outer|inner
+            ''')
+
+def switchNetworkConfiguration(networktype):
+    wmiobj = wmi.WMI()
+    configurations = wmiobj.Win32_NetworkAdapterConfiguration(Description='Intel(R) Ethernet Connection (3) I218-LM', IPEnabled=True)
+
+    conf = configparser.ConfigParser()
+    conf.read("F:/python/mytool/networkAdapterConf.ini")
+
+    subnetmask = conf["public"]["submask"]
+
+    if networktype == "outer":
+        ipaddress = conf["interface_outer"]["ipaddress"]
+        defaultgateway = conf["interface_outer"]["defaultgateway"]
+        dnsserver = conf["interface_outer"]["dnsserver"]
+    elif networktype == "inner":
+        ipaddress = conf["interface_inner"]["ipaddress"]
+        defaultgateway = conf["interface_inner"]["defaultgateway"]
+        dnsserver = conf["interface_inner"]["dnsserver"]
+    else:
+        return False
+
+    ret = configurations[0].SetGateways(DefaultIPGateway=[defaultgateway])
+    ret1 = configurations[0].SetDNSServerSearchOrder(DNSServerSearchOrder = [dnsserver])
+    ret2 = configurations[0].EnableStatic(IPAddress = [ipaddress], SubnetMask = [subnetmask])
+
+    if (ret[0] == 0 and ret1[0] == 0 and ret2[0] == 0):
+        return True
+    else:
+        print("Error:the errorcode are ret:%s,ret1:%s,ret2:%s"%(ret,ret1,ret2))
+        return False
+
+def displayNetworkConfiguration():
+    wmiobj = wmi.WMI()
+    sql = "select IPAddress,IPSubnet,DefaultIPGateway,DNSServerSearchOrder from Win32_NetworkAdapterConfiguration where Description=\"Intel(R) Ethernet Connection (3) I218-LM\" and IPEnabled=TRUE"
+    current_configuration = wmiobj.query(sql)
+    print("Now your NetworkAdapter configuration are:")
+    print(current_configuration[0])
+
+def main():
+    if (len(sys.argv) == 2):
+        if (sys.argv[1] != "outer" and sys.argv[1] != "inner"):
+            usage()
+            exit()
+        else:
+            networktype = sys.argv[1]
+    else:
+        usage()
+        exit()
+
+    result = switchNetworkConfiguration(networktype)
+
+    if result == True:
+        print("Switch NetworkConfiguration success !")
+        displayNetworkConfiguration()
+    else:
+        print("Switch NetworkConfiguration failed !")
+
+if __name__ == "__main__":
+    main()
