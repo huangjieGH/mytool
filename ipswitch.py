@@ -1,9 +1,10 @@
 import wmi
 import sys
 import configparser 
+from colorama import init,Fore,Back,Style
 
 def usage():
-    print('''Usage:
+    print(Fore.GREEN + Back.WHITE + Style.DIM + '''Usage:
              ipswitch outer|inner
             ''')
 
@@ -34,15 +35,19 @@ def switchNetworkConfiguration(networktype):
     if (ret[0] == 0 and ret1[0] == 0 and ret2[0] == 0):
         return True
     else:
-        print("Error:the errorcode are ret:%s,ret1:%s,ret2:%s"%(ret,ret1,ret2))
+        print(Fore.RED + Back.YELLOW + "Error:the errorcode are ret:%s,ret1:%s,ret2:%s"%(ret,ret1,ret2))
         return False
 
 def displayNetworkConfiguration():
     wmiobj = wmi.WMI()
     sql = "select IPAddress,IPSubnet,DefaultIPGateway,DNSServerSearchOrder from Win32_NetworkAdapterConfiguration where Description=\"Intel(R) Ethernet Connection (3) I218-LM\" and IPEnabled=TRUE"
     current_configuration = wmiobj.query(sql)
-    print("Now your NetworkAdapter configuration are:")
-    print(current_configuration[0])
+    print(Fore.GREEN + Back.WHITE + "Now your NetworkAdapter configuration are:")
+    #print(current_configuration[0])
+    print(Fore.GREEN + Back.BLACK + "DefaultIPGateway:%s"%current_configuration[0].DefaultIPGateway)
+    print(Fore.GREEN + Back.BLACK + "DNSServerSearchOrder:%s"%current_configuration[0].DNSServerSearchOrder)
+    print(Fore.GREEN + Back.BLACK + "IPAddress:%s"%current_configuration[0].IPAddress)
+    print(Fore.GREEN + Back.BLACK + "IPSubnet:%s"%current_configuration[0].IPSubnet)
 
 def main():
     if (len(sys.argv) == 2):
@@ -58,10 +63,12 @@ def main():
     result = switchNetworkConfiguration(networktype)
 
     if result == True:
-        print("Switch NetworkConfiguration success !")
+        print(Fore.GREEN + Back.WHITE + "Switch NetworkConfiguration success !\n")
         displayNetworkConfiguration()
     else:
-        print("Switch NetworkConfiguration failed !")
+        print(Fore.RED + Back.YELLOW + "Switch NetworkConfiguration failed !")
 
 if __name__ == "__main__":
+    #初始化 colorama
+    init(autoreset = True)
     main()
