@@ -2,6 +2,7 @@ import wmi
 import sys
 import configparser 
 import argparse
+import datetime
 from colorama import init,Fore,Back,Style
 from __init__ import __version__
 
@@ -52,6 +53,9 @@ def get_parser():
     parser.add_argument('-v', '--version', help='displays the current version of ipswitch',action='store_true')
     return parser
 
+def get_datetime():
+    return datetime.datetime.now()
+
 def command_line_runner():
     parser = get_parser()
     args = vars(parser.parse_args())
@@ -72,6 +76,9 @@ def command_line_runner():
             print(Fore.RED + Back.YELLOW + "Switch NetworkConfiguration failed !")
 
 if __name__ == "__main__":
+    starttime = get_datetime()
     #初始化 colorama
     init(autoreset = True)
     command_line_runner()
+    endtime = get_datetime()
+    print('\n' + Fore.RED + Back.YELLOW + 'Total spend:%s'%(endtime - starttime))
