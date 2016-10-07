@@ -6,14 +6,14 @@ import datetime
 from colorama import init,Fore,Back,Style
 from __init__ import __version__
 
+conf = configparser.ConfigParser()
+conf.read("E:/DATA/F/python/mytool/networkAdapterConf.ini")
+networkdesc = conf["public"]["networkdesc"]
+subnetmask = conf["public"]["submask"]
+wmiobj = wmi.WMI()
+
 def switchNetworkConfiguration(networktype):
-    wmiobj = wmi.WMI()
-    configurations = wmiobj.Win32_NetworkAdapterConfiguration(Description='Intel(R) Ethernet Connection (3) I218-LM', IPEnabled=True)
-
-    conf = configparser.ConfigParser()
-    conf.read("F:/python/mytool/networkAdapterConf.ini")
-
-    subnetmask = conf["public"]["submask"]
+    configurations = wmiobj.Win32_NetworkAdapterConfiguration(Description=networkdesc, IPEnabled=True)
 
     if networktype == "outer":
         ipaddress = conf["interface_outer"]["ipaddress"]
@@ -37,8 +37,7 @@ def switchNetworkConfiguration(networktype):
         return False
 
 def displayNetworkConfiguration():
-    wmiobj = wmi.WMI()
-    sql = "select IPAddress,IPSubnet,DefaultIPGateway,DNSServerSearchOrder from Win32_NetworkAdapterConfiguration where Description=\"Intel(R) Ethernet Connection (3) I218-LM\" and IPEnabled=TRUE"
+    sql = "select IPAddress,IPSubnet,DefaultIPGateway,DNSServerSearchOrder from Win32_NetworkAdapterConfiguration where Description=\"" + networkdesc + "\" and IPEnabled=TRUE"
     current_configuration = wmiobj.query(sql)
     print(Fore.GREEN + Back.WHITE + "Now your NetworkAdapter configuration are:")
     #print(current_configuration[0])
@@ -75,10 +74,18 @@ def command_line_runner():
         else:
             print(Fore.RED + Back.YELLOW + "Switch NetworkConfiguration failed !")
 
+#def _timeit_analyze_(func):
+#    from timeit import Timer
+#    t1 = Timer("%s()" % func.__name__, "from __main__ import %s" % func.__name__)
+#    print("{:<20}{:10.6} s".format(func.__name__ + ":", t1.timeit(1)))
+
 if __name__ == "__main__":
+    import timeit
     starttime = get_datetime()
     #初始化 colorama
     init(autoreset = True)
     command_line_runner()
     endtime = get_datetime()
     print('\n' + Fore.RED + Back.YELLOW + 'Total spend:%s'%(endtime - starttime))
+
+    #_timeit_analyze_(command_line_runner)
