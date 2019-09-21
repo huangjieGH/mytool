@@ -11,7 +11,7 @@
 					<key>kind</key>
 					<string>software-package</string>
 					<key>url</key>
-					<string>https://136.142.21.155:8443/Analy/pages/resource/download/2019082402.ipa</string>
+					<string>https://136.142.21.155:8443/Analy/pages/resource/download/2019092002.ipa</string>
 				</dict>
 				<dict>
 					<key>kind</key>
@@ -35,7 +35,7 @@
 				<key>bundle-identifier</key>
 				<string>com.bonc.DataPortal.TELECOM.HE</string>
 				<key>bundle-version</key>
-				<string>2019082402</string>
+				<string>2019092002</string>
 				<key>kind</key>
 				<string>software</string>
 				<key>subtitle</key>
